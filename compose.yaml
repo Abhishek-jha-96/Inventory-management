@@ -1,0 +1,33 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ethara
+      POSTGRES_PASSWORD: ethara
+      POSTGRES_DB: ethara
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ethara -d ethara"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://ethara:ethara@db:5432/ethara
+    volumes:
+      - ./apps/backend/app:/app/app
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
