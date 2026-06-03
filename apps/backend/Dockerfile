@@ -27,7 +27,9 @@ RUN groupadd --system --gid 999 nonroot \
 WORKDIR /app
 
 COPY --from=builder --chown=nonroot:nonroot /app/.venv /app/.venv
-COPY --from=builder --chown=nonroot:nonroot /app/app  /app/app
+COPY --from=builder --chown=nonroot:nonroot /app/app /app/app
+COPY --from=builder --chown=nonroot:nonroot /app/alembic.ini /app/alembic.ini
+COPY --from=builder --chown=nonroot:nonroot /app/alembic /app/alembic
 
 ENV PATH="/app/.venv/bin:$PATH" \
     PYTHONDONTWRITEBYTECODE=1 \

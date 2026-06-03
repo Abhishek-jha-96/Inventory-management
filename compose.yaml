@@ -1,16 +1,18 @@
 services:
   db:
     image: postgres:17-alpine
-    environment:
-      POSTGRES_USER: ethara
-      POSTGRES_PASSWORD: ethara
-      POSTGRES_DB: ethara
+    env_file:
+      - .env
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ethara -d ethara"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}",
+        ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -19,12 +21,14 @@ services:
     build:
       context: ./apps/backend
       dockerfile: Dockerfile
+    env_file:
+      - .env
     ports:
       - "8000:8000"
-    environment:
-      DATABASE_URL: postgresql+asyncpg://ethara:ethara@db:5432/ethara
     volumes:
       - ./apps/backend/app:/app/app
+      # Alembic lives in the image (see Dockerfile). Run migrations on the host with
+      # `uv run alembic` or exec into the container without bind-mounting alembic.
     depends_on:
       db:
         condition: service_healthy
