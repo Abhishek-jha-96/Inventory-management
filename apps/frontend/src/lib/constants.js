@@ -1,4 +1,4 @@
-export const API_BASE = import.meta.env.VITE_API_BASE ?? '/api'
+export const API_BASE = import.meta.env.VITE_API_BASE
 
 /** Products at or below this quantity are shown as low stock on the dashboard. */
 export const LOW_STOCK_THRESHOLD = 10
